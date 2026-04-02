@@ -1,4 +1,6 @@
 #lang racket
+(require "Tarea2Gui.rkt")
+
 
 
 ; Board data structure:
@@ -263,7 +265,7 @@
 
 
 
-(provide GenerateMatrix)
+
 
 
 

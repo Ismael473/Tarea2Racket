@@ -1,28 +1,54 @@
 #lang racket/gui
 
+
 ; --- Starting state variables ---
 (define rows 4)    ; N (Rows)
 (define columns 4) ; M (Columns)
 
-(define frame (new frame% [label "Configurador de Cuadrícula NxM"] [width 500] [height 500]))
+(define frame 
+  (new frame% 
+  [label "Configurador de Cuadrícula NxM"] 
+  [width 500] 
+  [height 500]))
 
 ; Horizontal Pane for the controls
-(define control-panel (new horizontal-panel% [parent frame] [alignment '(center center)] [stretchable-height #f]))
+(define control-panel 
+  (new horizontal-panel% 
+  [parent frame] 
+  [alignment '(center center)] 
+  [stretchable-height #f]))
 
 ; --- Selection Controls ---
 (define row-slider
-  (new slider% [label "Filas (N)"] [min-value 4] [max-value 10]
-       [parent control-panel] [init-value rows]
+  (new slider% 
+  [label "Filas (N)"] 
+  [min-value 4] 
+  [max-value 10]
+  [parent control-panel]
+  [init-value rows]
        [callback (lambda (s e) 
                    (set! rows (send s get-value))
-                   (send canvas refresh))]))
+                   )]
+       ))
+  
 
 (define col-slider
-  (new slider% [label "Columnas (M)"] [min-value 4] [max-value 10]
-       [parent control-panel] [init-value columns]
-       [callback (lambda (s e) 
+  (new slider% 
+  [label "Columnas (M)"] 
+  [min-value 4] 
+  [max-value 10]
+  [parent control-panel] 
+  [init-value columns]
+  [callback (lambda (s e) 
                    (set! columns (send s get-value))
-                   (send canvas refresh))]))
+                   )]))
+
+(define establish-button
+  (new button%
+  [label "Establecer"]
+  [parent control-panel]
+  [callback (lambda (s e) 
+              (send canvas refresh))]))
 
 ; --- Drawing space  ---
 (define grid-canvas%
