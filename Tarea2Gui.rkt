@@ -45,6 +45,14 @@
                    (set! columns (send s get-value))
                    )]))
 
+
+(define win-condition
+  (new text-field%
+       [label "Puntaje objetivo"]
+       [parent control-panel]
+       ;[callback (lambda(s e)
+                   ))
+
 (define establish-button
   (new button%
        [label "Establecer e Iniciar"]
@@ -69,8 +77,8 @@
       (define w (get-width))
       (define h (get-height))
 
-      (define cell-w(/ w columns))
-      (define cell-h(/ h rows))
+      (define cell-w(quotient w columns))
+      (define cell-h(quotient h rows))
       
 
       (for([row GameMatrix][r (in-naturals)])
