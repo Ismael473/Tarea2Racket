@@ -234,6 +234,37 @@
 
 
 
+; ------- Win condition -------
+; Check for winning before losing.
+; Find the highest achieved value in the matrix and compare it to target.
+; If the highest achieved is greater, return true.
+(define (WinConditionMet? matrix target) (>= (HighestInMatrix matrix 0) target))
+
+; Find the highest number in a list.
+; Starting values: row, 0
+(define (HighestInRow row current_highest)
+  (cond
+    ; Stop condition.
+    [(empty? row) current_highest]
+    ; Is the current number greater than current_highest?
+    [(> (car row) current_highest) (HighestInRow (cdr row) (car row))]
+    [else (HighestInRow (cdr row) current_highest)]
+    ))
+; Find the highest number in a matrix.
+; Starting values: matrix, 0
+(define (HighestInMatrix matrix current_highest)
+  (cond
+    ; Stop condition.
+    [(empty? matrix) current_highest]
+    ; Is the current number greater than current_highest?
+    [(> (HighestInRow (car matrix) 0) current_highest) (HighestInMatrix (cdr matrix) (HighestInRow (car matrix) 0))]
+    [else (HighestInMatrix (cdr matrix) current_highest)]
+    ))
+; ------- Game Over condition -------
+; Returns t# if on game over.
+(define (GameOverConditionMet? matrix)
+  (and (equal? matrix (MoveLeftMatrix matrix)) (equal? matrix (MoveRightMatrix matrix)) (equal? matrix (MoveDownMatrix matrix)) (equal? matrix (MoveUpMatrix matrix)))
+  )
 
 
 
@@ -242,11 +273,36 @@
 
 
 
+; --------------------- TESTS ---------------------
+; (HighestInMatrix
+;   '((1 2 0 4)
+;   (0 0 8 0)
+;   (0 0 2 0)
+;   (4 8 0 2))
 
+;   0)
 
+; (GameOverConditionMet?
+;   '((1 2 0 4)
+;   (0 0 8 0)
+;   (0 0 2 0)
+;   (4 8 0 2))
+; )
+; (GameOverConditionMet?
+;   '((1 2 4 8)
+;     (16 32 64 128)
+;     (256 512 1024 2048)
+;     (4096 8192 16384 32768))
+; )
 
+; (WinConditionMet?
+;   '((4 2 4 8)
+;     (16 32 64 128)
+;     (256 512 1024 2048)
+;     (0 2 3 4))
 
-
+;   2048
+; )
 
 
 
