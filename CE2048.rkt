@@ -306,4 +306,12 @@
 
 
 
-(provide GenerateMatrix InsertRandomNumber MoveUpMatrix MoveDownMatrix MoveLeftMatrix MoveRightMatrix CountZeros )
+(provide GenerateMatrix
+         InsertRandomNumber
+         MoveUpMatrix
+         MoveDownMatrix
+         MoveLeftMatrix
+         MoveRightMatrix
+         CountZeros
+         WinConditionMet?
+         GameOverConditionMet?)
