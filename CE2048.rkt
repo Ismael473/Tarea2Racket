@@ -42,7 +42,47 @@
 ;     )
 ; (define (GetRestOfRow row) (cons (cdar row) cdr row))
 
+; Calc Score
 
+(define (CalcScoreLeftMtx mtx score)
+  (cond
+    [(empty? mtx) score]
+    [else (+ (CalcScoreLeftRow (car mtx)) (CalcScoreLeftMtx (cdr mtx) score))]))
+
+(define (CalcScoreRightMtx mtx score)
+  (cond
+    [(empty? mtx) score]
+    [else (+ (CalcScoreRightRow (car mtx)) (CalcScoreRightMtx (cdr mtx) score))]))
+
+(define (CalcScoreUpMtx mtx score)
+  (CalcScoreLeftMtx (Transpose mtx) score)
+  )
+
+(define (CalcScoreDownMtx mtx score)
+  (CalcScoreRightMtx (Transpose mtx) score)
+  )
+
+(define (CalcScoreLeftRow row)
+ (CalcScoreLeftRowAux row (FindSuccesfulMatches row '() 0) #f)
+ )
+
+(define (CalcScoreRightRow row)
+ (CalcScoreLeftRowAux (reverse row) (FindSuccesfulMatches row '() 0) #f)
+ )
+
+(define (CalcScoreLeftRowAux row succesful_matches is_adding_pair)
+  (cond
+    [(empty? row) 0] 
+    [(equal? (car row) 0) (CalcScoreLeftRowAux (cdr row) succesful_matches is_adding_pair)]
+    [else (cond
+            [is_adding_pair (+ (* (car row) 2) (CalcScoreLeftRowAux (cdr row) (cdr succesful_matches) #f))]
+            [else (cond
+                    [(not (car succesful_matches)) (CalcScoreLeftRowAux (cdr row) (cdr succesful_matches) #f)]
+                    [else (CalcScoreLeftRowAux (cdr row) succesful_matches #t)]
+                    )]
+            )]
+    )
+  )
 
 ; Calculate a new row based on the current row and moving left.
 ; Receives a row of the matrix and returns that row after a move to the left.
@@ -267,12 +307,6 @@
   )
 
 
-
-
-
-
-
-
 ; --------------------- TESTS ---------------------
 ; (HighestInMatrix
 ;   '((1 2 0 4)
@@ -314,4 +348,8 @@
          MoveRightMatrix
          CountZeros
          WinConditionMet?
-         GameOverConditionMet?)
+         GameOverConditionMet?
+         CalcScoreLeftMtx
+         CalcScoreRightMtx
+         CalcScoreUpMtx
+         CalcScoreDownMtx)

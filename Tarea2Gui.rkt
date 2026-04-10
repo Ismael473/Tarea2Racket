@@ -4,9 +4,21 @@
 ; --- Starting state variables ---
 (define rows 4)    ; N (Rows)
 (define columns 4) ; M (Columns)
-(define score 2048) ; Sets the initial Win condition to reach 2048
+(define winCondition 2048) ; Sets the initial Win condition to reach 2048
 
-(define GameMatrix (GenerateMatrix (* rows columns) 0 rows columns '() )); Calls the GenerateMatrix feature and sends 
+(define GameMatrix (GenerateMatrix (* rows columns) 0 rows columns '() )); Calls the GenerateMatrix feature and sends
+(define score 0)
+
+(define (tileColor value)
+  (if (= value 0)
+      "white"
+      (make-object color%
+        255
+        (inexact->exact(max 50 (- 255 (* 20 (log value 2)))))
+        (inexact->exact(max 50 (- 255 (* 20 (log value 2)))))
+        )
+      )
+  )
 
 (define frame 
   (new frame% 
@@ -54,6 +66,8 @@
        [init-value "2048"]
        ))
 
+
+
 (define establish-button; This button is important because it sets rows, columns and win condition and starts the game every time it gets pressed
   (new button%
        [label "Establecer e Iniciar"]
@@ -61,17 +75,28 @@
        [callback (lambda (s e)
                    (let ([val (string->number (send win-condition get-value))]);This part set the win condition
                      (if val
-                         (set! score val)
-                         (set! score 2048)))
+                         (set! winCondition val)
+                         (set! winCondition 2048)))
                    (set! GameMatrix (GenerateMatrix rows 0 columns rows '()));This part sets and resets the game board
                    (set! GameMatrix (InsertRandomNumber GameMatrix));This part starts the game placing the first number
+                   (set! score 0)
+                   (send score-disp set-label
+                         (string-append "Puntaje: "(number->string score)))
                    (send canvas refresh))]));This sends all the prior data to the canvas so it can be displayed
 
 
+(define score-panel ;This is the space where the sliders, text field and buttons are gonna be displayed.
+  (new horizontal-panel% 
+       [parent frame] 
+       [alignment '(center center)] 
+       [stretchable-height #f]
+       ))
 
-
-
-
+(define score-disp
+  (new message%
+       [parent score-panel]
+       [label "Puntaje: 0"]
+       [min-width 70]))
 
 ; --- Drawing space  ---
 (define grid-canvas% ;Defines the type of canvas
@@ -92,7 +117,7 @@
           (let ([x-pos (* c cell-w)] ;This part is gonna set up which position is gonna have each column of tiles
                 [y-pos (* r cell-h)]) ;This part is gonna set up which position is gonna have each row of tiles
             
-            (send dc set-brush (if (= value 0) "bisque" "orange") 'solid); This set the tile colors based if they are empty or not
+            (send dc set-brush (tileColor value) 'solid); This set the tile colors based if they are empty or not
             (send dc set-pen "black" 1 'solid) ;This makes the lines between the tiles
             (send dc draw-rectangle x-pos y-pos cell-w cell-h) ;This draws tile
             
@@ -110,20 +135,28 @@
 
       ;From line 112 through line 117 is just what happens if any of the arrows is being pressed, and if there is like a different key pressed is gonna ignore it
       (cond 
-        [(equal? key 'up) (set! GameMatrix (MoveUpMatrix GameMatrix))]
-        [(equal? key 'down) (set! GameMatrix (MoveDownMatrix GameMatrix))]
-        [(equal? key 'right) (set! GameMatrix (MoveRightMatrix GameMatrix))]
-        [(equal? key 'left) (set! GameMatrix (MoveLeftMatrix GameMatrix))]
+        [(equal? key 'up)
+         (set! score (CalcScoreUpMtx GameMatrix score))
+         (set! GameMatrix (MoveUpMatrix GameMatrix))]
+        [(equal? key 'down)
+         (set! score (CalcScoreDownMtx GameMatrix score))
+         (set! GameMatrix (MoveDownMatrix GameMatrix))]
+        [(equal? key 'right)
+         (set! score (CalcScoreRightMtx GameMatrix score))
+         (set! GameMatrix (MoveRightMatrix GameMatrix))]
+        [(equal? key 'left)
+         (set! score (CalcScoreLeftMtx GameMatrix score))
+
+         (set! GameMatrix (MoveLeftMatrix GameMatrix))]
         [else (void)]) ;This is what ignores if there was a different key being pressed
-
       
-
       (when (not (equal? old-matrix GameMatrix)) ;This compares if the matrix is the same it does nothing, and if it changes adds a a random number
         (set! GameMatrix (InsertRandomNumber GameMatrix))
         (send this refresh)
-
+        (send score-disp set-label
+              (string-append "Puntaje: "(number->string score)))
         (cond ;This compares on each move if the win condition is being met or if there are no more posible movements 
-          [(WinConditionMet? GameMatrix score)
+          [(WinConditionMet? GameMatrix winCondition)
            (message-box "Ganaste" "llegaste al puntaje deseado" frame '(ok))]
 
           [(GameOverConditionMet? GameMatrix)
