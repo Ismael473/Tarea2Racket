@@ -22,7 +22,7 @@
 
 (define frame 
   (new frame% 
-       [label "Configurador de Cuadrícula 2048"] 
+       [label "CE2048"] 
        [width 500] 
        [height 500]))
 
