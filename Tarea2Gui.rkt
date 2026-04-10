@@ -82,6 +82,7 @@
                    (set! score 0)
                    (send score-disp set-label
                          (string-append "Puntaje: "(number->string score)))
+                   ;(display winCondition) ; debug display
                    (send canvas refresh))]));This sends all the prior data to the canvas so it can be displayed
 
 
